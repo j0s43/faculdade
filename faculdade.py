@@ -1,11 +1,13 @@
 # importando as bibliotecas
 from flask import Flask, render_template, request
 from flaskext.mysql import MySQL
+from db import config, connect
 
 # Instanciar a app e o bd
 faculdade = Flask(__name__)
 mysql = MySQL()
 mysql.init_app(faculdade)
+
 
 # criar uma rota para /
 @faculdade.route('/')
@@ -23,18 +25,18 @@ def login():
     param_nome = request.form.get('nome')
     param_senha = request.form.get('senha')
 
-    # conectar no bd
-    faculdade.config['MYSQL_DATABASE_USER'] = 'root'
-    faculdade.config['MYSQL_DATABASE_PASSWORD'] = 'root'
-    faculdade.config['MYSQL_DATABASE_DB'] = 'faculdade'
+    # configurar o db
+    config(faculdade)
 
-    # obtendo o cursor
-    cursor = mysql.get_db().cursor()
+    # obtendo a conexao e o cursor
+    conn, cursor = connect(mysql)
 
     # executando o sql
     cursor.execute(f'SELECT idusuario FROM usuario where nomeusuario = "{param_nome}" and senhausuario = "{param_senha}"')
+
     # obter o retorno
     idusuario = cursor.fetchone()
+
     #fechar o cursor
     cursor.close()
 
@@ -51,13 +53,11 @@ def listar_turmas():
     # recuperar os parametros
     id = request.args.get('id')
 
-    # conectar no bd
-    faculdade.config['MYSQL_DATABASE_USER'] = 'root'
-    faculdade.config['MYSQL_DATABASE_PASSWORD'] = 'root'
-    faculdade.config['MYSQL_DATABASE_DB'] = 'faculdade'
+    # configurar o db
+    config(faculdade)
 
-    # obtendo o cursor
-    cursor = mysql.get_db().cursor()
+    # obtendo a conexao e o cursor
+    conn, cursor = connect(mysql)
 
     # executar o sql
     cursor.execute(f'SELECT d.nomedisciplina, d.cursodisciplina, t.nometurma, t.diaturma from disciplina d, turma t, usuario u where u.idusuario = {id} and t.idusuario = u.idusuario and d.iddisciplina = t.iddisciplina')
