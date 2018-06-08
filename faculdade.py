@@ -2,6 +2,7 @@
 from flask import Flask, render_template, request
 from flaskext.mysql import MySQL
 from db import config, connect
+from dao import usuario
 
 # Instanciar a app e o bd
 faculdade = Flask(__name__)
@@ -31,19 +32,13 @@ def login():
     # obtendo a conexao e o cursor
     conn, cursor = connect(mysql)
 
-    # executando o sql
-    cursor.execute(f'SELECT idusuario FROM usuario where nomeusuario = "{param_nome}" and senhausuario = "{param_senha}"')
+    # validar o usuario
+    usuario_existe, idusuario = usuario.validar_usuario(cursor, param_nome, param_senha)
 
-    # obter o retorno
-    idusuario = cursor.fetchone()
-
-    #fechar o cursor
-    cursor.close()
-
-    if idusuario is None:
-        return 'Usuario invalido'
+    if usuario_existe:
+        return render_template('principal.html', nome=param_nome, idusuario=idusuario)
     else:
-        return render_template('principal.html', nome=param_nome, idusuario=idusuario[0])
+        return 'Usuario invalido'
 
 
 # rata para /listarturma
