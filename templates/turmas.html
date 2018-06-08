@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Turmas de {{id}}</title>
+</head>
+<body>
+<h1>Turmas de {{id}}</h1>
+
+{% for turma in turmas %}
+{{turma[0]}}{{turma[2]}}<br>
+
+{% endfor %}
+
+</body>
+</html>
